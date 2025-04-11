@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">User Panel</a>
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Выйти</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Ваш профиль</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Имя:</strong> <span id="username"></span></p>
+                    <p><strong>Почта:</strong> <span id="useremail"></span></p>
+                    <p><strong>Роли:</strong> <span id="userroles"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="mb-3">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#editModal">Редактировать профиль</button>
+                <button class="btn btn-danger" id="deleteProfileBtn">Удалить профиль</button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5>Добро пожаловать!</h5>
+                    <p>Здесь вы можете при желании добавить дополнительную информацию о вашем профиле.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать профиль</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="userId" />
+                    <div class="form-group">
+                        <label>Имя</label>
+                        <input type="text" class="form-control" name="name" id="editName" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Почта</label>
+                        <input type="email" class="form-control" name="email" id="editEmail" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль (оставить пустым, если не хотите менять)</label>
+                        <input type="password" class="form-control" name="password" id="editPassword" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    let currentUser = {};
+
+    function loadUser() {
+        fetch('/api/user')
+            .then(res => res.json())
+            .then(user => {
+                currentUser = user;
+                document.getElementById('username').textContent = user.name;
+                document.getElementById('useremail').textContent = user.email;
+                document.getElementById('userroles').textContent = Array.from(user.roles).map(r => r.name).join(', ');
+
+                document.getElementById('userId').value = user.id;
+                document.getElementById('editName').value = user.name;
+                document.getElementById('editEmail').value = user.email;
+                document.getElementById('editPassword').value = '';
+            });
+    }
+
+    document.getElementById('editForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const payload = {
+            id: document.getElementById('userId').value,
+            name: document.getElementById('editName').value,
+            email: document.getElementById('editEmail').value,
+            password: document.getElementById('editPassword').value
+        };
+
+        fetch('/api/user', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.text())
+            .then(() => {
+                $('#editModal').modal('hide');
+                loadUser();
+                alert("Профиль обновлен!");
+            })
+            .catch(() => alert("Ошибка при обновлении профиля"));
+    });
+
+    document.getElementById('deleteProfileBtn').addEventListener('click', () => {
+        if (!confirm("Вы уверены, что хотите удалить профиль?")) return;
+
+        fetch('/api/user', {
+            method: 'DELETE'
+        })
+            .then(() => {
+                alert("Профиль удалён");
+                window.location.href = '/logout';
+            })
+            .catch(() => alert("Ошибка при удалении профиля"));
+    });
+
+    window.onload = loadUser;
+</script>
+
+</body>
+</html>
