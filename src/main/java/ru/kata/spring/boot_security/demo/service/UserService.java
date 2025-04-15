@@ -6,8 +6,5 @@ public interface UserService {
     User findById(Long id);
     User findByEmail(String email);
 
-    User getUser(Long id); // если реально нужен
-    void update(User user);
-    void deleteUser(Long id);
-    void saveUser(User user);
+    User getUser(Long id);
 }

@@ -26,27 +26,10 @@ public class UserServiceImpl implements UserService {
         return userDao.getUserByEmail(email);
     }
 
-    // если реально нужно, пусть возвращает getUserById
+
     @Override
     public User getUser(Long id) {
         return userDao.getUserById(id);
     }
 
-    @Override
-    public void update(User user) {
-        userDao.updateUser(user);
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        userDao.deleteUser(id);
-    }
-
-    @Override
-    public void saveUser(User user) {
-        // Если пароль ещё не кодирован — кодируем
-        // (зависит от логики, можно проверять, matches(...) ?)
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userDao.saveUser(user);
-    }
 }
