@@ -30,11 +30,7 @@ public class RoleDaoImpl implements RoleDao {
 
     @Override
     public void saveRole(Role role) {
-        if (role.getId() == null) {
             em.persist(role);
-        } else {
-            em.merge(role);
-        }
     }
 
     @Override

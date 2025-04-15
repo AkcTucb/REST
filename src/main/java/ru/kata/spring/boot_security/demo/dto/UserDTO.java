@@ -1,4 +1,4 @@
-package ru.kata.spring.boot_security.demo.DTO;
+package ru.kata.spring.boot_security.demo.dto;
 
 import ru.kata.spring.boot_security.demo.model.User;
 import java.util.List;

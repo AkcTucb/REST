@@ -5,8 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +28,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void saveUser(User user) {
-        if (user.getId() == null) {
-            em.persist(user);
-        } else {
-            em.merge(user);
-        }
+        em.persist(user);
     }
 
     @Override
@@ -52,28 +46,23 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User getUserByName(String name) {
-        try {
-            return em.createQuery("SELECT u FROM User u WHERE u.name = :name", User.class)
-                    .setParameter("name", name)
-                    .getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
+        return em.createQuery("SELECT u FROM User u WHERE u.name = :name", User.class)
+                .setParameter("name", name)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public User getUserByEmail(String email) {
-        try {
-            return em.createQuery(
-                            "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :email", User.class)
-                    .setParameter("email", email)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        } catch (NonUniqueResultException e) {
-            System.out.println("Ошибка: Найдено несколько пользователей с email: " + email);
-            return null;
-        }
+        return em.createQuery(
+                        "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :email",
+                        User.class
+                )
+                .setParameter("email", email)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
