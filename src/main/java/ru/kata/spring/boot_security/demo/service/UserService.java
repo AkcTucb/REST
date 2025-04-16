@@ -2,9 +2,8 @@ package ru.kata.spring.boot_security.demo.service;
 
 import ru.kata.spring.boot_security.demo.model.User;
 
-public interface UserService {
-    User findById(Long id);
-    User findByEmail(String email);
+import java.util.Map;
 
-    User getUser(Long id);
+public interface UserService {
+    Map<String,Object> getCurrentUserInfo(String email); // NEW
 }

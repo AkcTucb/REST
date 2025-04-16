@@ -19,7 +19,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Set<Role> findRolesByName(List<String> roleNames) {
-        // roleDao.findByNameIn(...) возвращает List<Role>, преобразуем в Set
         return new HashSet<>(roleDao.findByNameIn(roleNames));
     }
 

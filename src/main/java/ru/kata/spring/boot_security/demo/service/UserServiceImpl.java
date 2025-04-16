@@ -7,29 +7,25 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.dao.UserDao;
 import ru.kata.spring.boot_security.demo.model.User;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Override
-    public User findById(Long id) {
-        return userDao.findById(id).orElse(null);
+    public Map<String,Object> getCurrentUserInfo(String email) {
+        User user = userDao.getUserByEmail(email);
+        if (user == null) return null;
+        Map<String,Object> m = new HashMap<>();
+        m.put("id", user.getId());
+        m.put("name", user.getName());
+        m.put("email", user.getEmail());
+        m.put("roles", user.getRoles());
+        return m;
     }
-
-    @Override
-    public User findByEmail(String email) {
-        return userDao.getUserByEmail(email);
-    }
-
-
-    @Override
-    public User getUser(Long id) {
-        return userDao.getUserById(id);
-    }
-
 }
